@@ -1,32 +1,37 @@
-int vinSupplier= A0;
-int vinReader = A2;
-int voutReader = A1;
-int triggerPin = A3;
-int raw= 0;
-float Vin= 3.3;
-float Vout= 0;
-float Rknown= 991;
-float Resistance= 0;
-float buffer= 0;
-int triggerPinVoltage = 0;
-int vinRaw = 0;
-boolean inprogress = false;
-int avgLength = 400;
-float average(float a[]);
+// Author: Marty Alcala
+// Description: This is an Arduino program to measure the value of a resistor in ohms.
 
+int vinSupplier= A0; // The 5V input voltage pin
+int vinReader = A2; // The pin that reads the exact input voltage
+int voutReader = A1; // The pin that reads the voltage accross the resistor being measured
+int triggerPin = A3; // The pin that listens to whether the button used to initiate the measurement is pressed
+int voutRaw= 0; // A variable to hold the ADC measurement of the voltage accross measured resistor
+int vinRaw = 0; // A variable to hold the ADC measurement of the input voltage
+float Vin= 0; // vinRaw mapped to an actual voltage value
+float Vout= 0; // voutRaw mapped to an actual voltage value
+float Rknown= 991; // the value of the known resistor
+float Resistance= 0; // the calculation of resistance
+int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
+
+boolean inprogress = false; // a boolean to let us know whether a test is currently in progress
+int avgLength = 400; // The number of measurements to be averaged
+float average(float a[]); // An averaging function
 
 void setup()
 {
-    pinMode(vinSupplier, OUTPUT);  
+    // Set the vinSupplier pin to be an output
+    pinMode(vinSupplier, OUTPUT); 
+   
+    // Begin serial communication 
     Serial.begin(9600);
 }
 
 void loop()
 {
-    
+    // Check to see if the push button is pressed to initiate a measurement
     triggerPinVoltage = analogRead(triggerPin);
     
-    // Only measure if the button has been pressed
+    // Only measure if the button has been pressed (and has been unpressed at least once since last measurement)
     if(triggerPinVoltage > 10 && !inprogress){
       
       // Let's take a whole bunch of measurements and average 
@@ -35,37 +40,35 @@ void loop()
       int i;
       for(i=0; i<avgLength; i++){
       
-      // Set inprogress to true to indicate a test has begun due to
-      // a button press
-      inprogress = true;
-      
-      // Drive the input to the ohm meter with a 3.3V input
-      analogWrite(vinSupplier, 255);
-      
-      // Read the voltage across the measured resistor
-      raw= analogRead(voutReader);
-      
-      // Read the voltage being supplied by vinSupplier
-      vinRaw = analogRead(vinReader);
-      //Serial.println(raw);
-      //Serial.println(vinRaw);
-      
-      Vin = (vinRaw/1024.0)*5.0;
-      Vout = (raw/1024.0)*5.0;
-      //Serial.println(Vin);
-      //Serial.println(Vout);
-      
-      float current = (Vin - Vout)/Rknown;
-      //Serial.println(current, 6);
-      Resistance = Vout/current;
-      //Resistance = (Vout*Rknown)/(Vin - Vout);
-      //Serial.println(Resistance);
-      resistanceArray[i] = Resistance;
-      
-      
-      // Turn off the input voltage
-      analogWrite(vinSupplier, 0);
-      //Serial.println("Test complete");
+        // Set inprogress to true to indicate a test has begun due to
+        // a button press
+        inprogress = true;
+        
+        // Drive the input to the ohm meter with a 5V input
+        analogWrite(vinSupplier, 255);
+        
+        // Read the voltage across the measured resistor
+        voutRaw= analogRead(voutReader);
+        
+        // Read the voltage being supplied by vinSupplier
+        vinRaw = analogRead(vinReader);
+        
+        // Map the ADC measured voltages to actual voltage values
+        Vin = (vinRaw/1024.0)*5.0;
+        Vout = (voutRaw/1024.0)*5.0;
+        
+        // Compute the current flowing through the known resistor
+        float current = (Vin - Vout)/Rknown;
+        
+        // Determine the resistance of the resistor we are measuring
+        Resistance = Vout/current;
+        
+        //Add the resistance value to our averaging array
+        resistanceArray[i] = Resistance;
+        
+        // Turn off the input voltage
+        analogWrite(vinSupplier, 0);
+        
       }// End for loop
       
       float finalResistance = average(resistanceArray);
@@ -83,7 +86,6 @@ void loop()
       // say this resistance measurement is over and can start a new one
       // once the button is pressed again.
       inprogress = false;
-      //Serial.println("off");
     }
     delay(1000);
 }
