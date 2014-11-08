@@ -14,7 +14,7 @@ float Resistance= 0; // the calculation of resistance
 int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
 
 boolean inprogress = false; // a boolean to let us know whether a test is currently in progress
-int avgLength = 10000; // The number of measurements to be averaged
+int avgLength = 1; // The number of measurements to be averaged
 float average(float a[]); // An averaging function
 
 void setup()
@@ -54,6 +54,9 @@ void loop()
         // Read the voltage being supplied by vinSupplier
         vinRaw = analogRead(vinReader);
         
+         // Turn off the input voltage
+        analogWrite(vinSupplier, 0);
+        
         // Map the ADC measured voltages to actual voltage values
         Vin = (vinRaw/1024.0)*5.0;
         Vout = (voutRaw/1024.0)*5.0;
@@ -64,12 +67,16 @@ void loop()
         // Determine the resistance of the resistor we are measuring
         Resistance = Vout/current;
         sum = sum + Resistance;
+        //Serial.println(Resistance);
+        
+         // Turn off the input voltage
+        //analogWrite(vinSupplier, 0);
         
         //Add the resistance value to our averaging array
         //resistanceArray[i] = Resistance;
+        delay(1000);
         
-        // Turn off the input voltage
-        analogWrite(vinSupplier, 0);
+       
         
       }// End for loop
       
