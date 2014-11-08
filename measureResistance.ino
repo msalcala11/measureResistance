@@ -37,6 +37,7 @@ void loop()
       // Let's take a whole bunch of measurements and average 
       // them to increase precision
       float resistanceArray[avgLength];
+      float sum = 0;
       int i;
       for(i=0; i<avgLength; i++){
       
@@ -62,18 +63,21 @@ void loop()
         
         // Determine the resistance of the resistor we are measuring
         Resistance = Vout/current;
+        sum = sum + Resistance;
         
         //Add the resistance value to our averaging array
-        resistanceArray[i] = Resistance;
+        //resistanceArray[i] = Resistance;
         
         // Turn off the input voltage
         analogWrite(vinSupplier, 0);
         
       }// End for loop
       
-      float finalResistance = average(resistanceArray);
+      //float finalResistance = average(resistanceArray);
+      float finalResistance2 = sum/avgLength;
       Serial.println("Final Resistance");
       Serial.println(finalResistance);
+      Serial.println(finalResistance2);
       
     }
     else if(triggerPinVoltage > 10 && inprogress){
