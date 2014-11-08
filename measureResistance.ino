@@ -9,7 +9,7 @@ int voutRaw= 0; // A variable to hold the ADC measurement of the voltage accross
 int vinRaw = 0; // A variable to hold the ADC measurement of the input voltage
 float Vin= 0; // vinRaw mapped to an actual voltage value
 float Vout= 0; // voutRaw mapped to an actual voltage value
-float Rknown= 991; // the value of the known resistor
+float Rknown= 14840;//991; // the value of the known resistor
 float Resistance= 0; // the calculation of resistance
 int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
 
