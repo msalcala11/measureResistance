@@ -14,7 +14,7 @@ float Resistance= 0; // the calculation of resistance
 int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
 
 boolean inprogress = false; // a boolean to let us know whether a test is currently in progress
-int avgLength = 400; // The number of measurements to be averaged
+int avgLength = 10000; // The number of measurements to be averaged
 float average(float a[]); // An averaging function
 
 void setup()
@@ -36,7 +36,7 @@ void loop()
       
       // Let's take a whole bunch of measurements and average 
       // them to increase precision
-      float resistanceArray[avgLength];
+      //float resistanceArray[avgLength];
       float sum = 0;
       int i;
       for(i=0; i<avgLength; i++){
@@ -76,7 +76,7 @@ void loop()
       //float finalResistance = average(resistanceArray);
       float finalResistance2 = sum/avgLength;
       Serial.println("Final Resistance");
-      Serial.println(finalResistance);
+     // Serial.println(finalResistance);
       Serial.println(finalResistance2);
       
     }
