@@ -9,12 +9,12 @@ int voutRaw= 0; // A variable to hold the ADC measurement of the voltage accross
 int vinRaw = 0; // A variable to hold the ADC measurement of the input voltage
 float Vin= 0; // vinRaw mapped to an actual voltage value
 float Vout= 0; // voutRaw mapped to an actual voltage value
-float Rknown= 14840;//991; // the value of the known resistor
+float Rknown= 14840;//14840;//991; // the value of the known resistor
 float Resistance= 0; // the calculation of resistance
 int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
 
 boolean inprogress = false; // a boolean to let us know whether a test is currently in progress
-int avgLength = 1; // The number of measurements to be averaged
+int avgLength = 1000; // The number of measurements to be averaged
 float average(float a[]); // An averaging function
 
 void setup()
@@ -67,14 +67,15 @@ void loop()
         // Determine the resistance of the resistor we are measuring
         Resistance = Vout/current;
         sum = sum + Resistance;
-        //Serial.println(Resistance);
+        Serial.println(Resistance);
+        //Serial.println(',');
         
          // Turn off the input voltage
         //analogWrite(vinSupplier, 0);
         
         //Add the resistance value to our averaging array
         //resistanceArray[i] = Resistance;
-        delay(1000);
+        //delay(1000);
         
        
         
@@ -91,6 +92,7 @@ void loop()
       // Do not do anything if the button has remained depressed since
       // the latest resistance measurement
       //Serial.println("Idling");
+      
     }
     else{
       // This means the button has be unpressed so we can finally
@@ -99,6 +101,7 @@ void loop()
       inprogress = false;
     }
     delay(1000);
+    
 }
 
 float average(float a[]){ 
