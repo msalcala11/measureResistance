@@ -1,6 +1,13 @@
 // Author: Marty Alcala
 // Description: This is an Arduino program to measure the value of a resistor in ohms.
 
+// Include bluetooth libraries
+#include <SPI.h>
+#include <boards.h>
+#include <RBL_nRF8001.h>
+#include <services.h> 
+
+// Initialize global variables
 int vinSupplier= A0; // The 5V input voltage pin
 int vinReader = A2; // The pin that reads the exact input voltage
 int voutReader = A1; // The pin that reads the voltage accross the resistor being measured
@@ -11,6 +18,7 @@ float Vin= 0; // vinRaw mapped to an actual voltage value
 float Vout= 0; // voutRaw mapped to an actual voltage value
 float Rknown= 14840;//14840;//991; // the value of the known resistor
 float Resistance= 0; // the calculation of resistance
+char charRes[10]; // The character array representation of the resistance for ble transmission
 int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
 
 boolean inprogress = false; // a boolean to let us know whether a test is currently in progress
@@ -24,6 +32,9 @@ void setup()
    
     // Begin serial communication 
     Serial.begin(9600);
+    
+    // Init. and start BLE library.
+    ble_begin();
 }
 
 void loop()
@@ -31,8 +42,14 @@ void loop()
     // Check to see if the push button is pressed to initiate a measurement
     triggerPinVoltage = analogRead(triggerPin);
     
-    // Only measure if the button has been pressed (and has been unpressed at least once since last measurement)
-    if(triggerPinVoltage > 10 && !inprogress){
+    // Only measure if we have received a ble command to do s0
+    if( ble_available() ){
+        
+      Serial.println("Ble Available");
+      
+      // Exhasut the ble data buffer so we have nothing left in there to cause a second test to run without user prompt
+      while ( ble_available() )
+        ble_read();
       
       // Let's take a whole bunch of measurements and average 
       // them to increase precision
@@ -87,6 +104,11 @@ void loop()
      // Serial.println(finalResistance);
       Serial.println(finalResistance2);
       
+      // Send the resistance measurement to the phone
+      ble_write('h');
+      ble_write('\n'); //the new line character let's the phone know the message is over
+       
+      
     }
     else if(triggerPinVoltage > 10 && inprogress){
       // Do not do anything if the button has remained depressed since
@@ -100,7 +122,9 @@ void loop()
       // once the button is pressed again.
       inprogress = false;
     }
+    ble_do_events();
     delay(1000);
+    
     
 }
 
