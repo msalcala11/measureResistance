@@ -103,16 +103,18 @@ void loop()
       Serial.println("Final Resistance");
      // Serial.println(finalResistance);
       Serial.println(finalResistance2);
+      
+      // Convert float resistance to char array so that we 
+      // can transmit over ble
       dtostrf(finalResistance2, 4, 3, charRes);
       
       for(int i=0;i<sizeof(charRes);i++)
       {
+        // Write to ble and to console
         ble_write(charRes[i]);
         Serial.print(charRes[i]);
       }
       
-      // Send the resistance measurement to the phone
-      //ble_write('h');
       ble_write('\n'); //the new line character let's the phone know the message is over
        
       
@@ -129,6 +131,8 @@ void loop()
       // once the button is pressed again.
       inprogress = false;
     }
+    
+    // Communicate changes
     ble_do_events();
     delay(1000);
     
