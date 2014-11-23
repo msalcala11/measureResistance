@@ -103,9 +103,16 @@ void loop()
       Serial.println("Final Resistance");
      // Serial.println(finalResistance);
       Serial.println(finalResistance2);
+      dtostrf(finalResistance2, 4, 3, charRes);
+      
+      for(int i=0;i<sizeof(charRes);i++)
+      {
+        ble_write(charRes[i]);
+        Serial.print(charRes[i]);
+      }
       
       // Send the resistance measurement to the phone
-      ble_write('h');
+      //ble_write('h');
       ble_write('\n'); //the new line character let's the phone know the message is over
        
       
