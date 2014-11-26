@@ -12,6 +12,7 @@ int vinSupplier= A0; // The 5V input voltage pin
 int vinReader = A2; // The pin that reads the exact input voltage
 int voutReader = A1; // The pin that reads the voltage accross the resistor being measured
 int triggerPin = A3; // The pin that listens to whether the button used to initiate the measurement is pressed
+int ledIndicator = A4; // Pin used to drive LED to alert the user a measurement is in progress
 int voutRaw= 0; // A variable to hold the ADC measurement of the voltage accross measured resistor
 int vinRaw = 0; // A variable to hold the ADC measurement of the input voltage
 float Vin= 0; // vinRaw mapped to an actual voltage value
@@ -29,6 +30,7 @@ void setup()
 {
     // Set the vinSupplier pin to be an output
     pinMode(vinSupplier, OUTPUT); 
+    pinMode(ledIndicator, OUTPUT);
    
     // Begin serial communication 
     Serial.begin(9600);
@@ -44,7 +46,7 @@ void loop()
     
     // Only measure if we have received a ble command to do s0
     if( ble_available() ){
-        
+      analogWrite(ledIndicator, 255);
       Serial.println("Ble Available");
       
       // Exhasut the ble data buffer so we have nothing left in there to cause a second test to run without user prompt
@@ -116,7 +118,7 @@ void loop()
       }
       
       ble_write('\n'); //the new line character let's the phone know the message is over
-       
+      analogWrite(ledIndicator, 0);
       
     }
     else if(triggerPinVoltage > 10 && inprogress){
@@ -134,7 +136,7 @@ void loop()
     
     // Communicate changes
     ble_do_events();
-    delay(1000);
+    //delay(1000);
     
     
 }
