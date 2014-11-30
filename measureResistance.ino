@@ -23,6 +23,7 @@ char charRes[10]; // The character array representation of the resistance for bl
 int triggerPinVoltage = 0; // the ADC measurement of the switch voltage
 
 boolean inprogress = false; // a boolean to let us know whether a test is currently in progress
+boolean canceled = false;
 int avgLength = 1000; // The number of measurements to be averaged
 float average(float a[]); // An averaging function
 
@@ -58,8 +59,15 @@ void loop()
       //float resistanceArray[avgLength];
       float sum = 0;
       int i;
-      for(i=0; i<avgLength; i++){
+      for(i=0; i<avgLength && canceled == false; i++){
       
+        if(ble_available()){
+          canceled = true;
+          Serial.println("test canceled");
+          while ( ble_available() )
+            ble_read();
+        }
+        ble_do_events();
         // Set inprogress to true to indicate a test has begun due to
         // a button press
         inprogress = true;
@@ -99,6 +107,8 @@ void loop()
        
         
       }// End for loop
+      
+      canceled = false;
       
       //float finalResistance = average(resistanceArray);
       float finalResistance2 = sum/avgLength;
